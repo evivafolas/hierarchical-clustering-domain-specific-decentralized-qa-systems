@@ -1,59 +1,123 @@
 from __future__ import print_function
-import pyLDAvis
-import pyLDAvis.sklearn
-import pyLDAvis.gensim_models
-from sklearn.decomposition import LatenteDirichletAllocation
-
-from gensim.models.doc2vec import Doc2Vec, TggedDocument
+# import pyLDAvis
+# import pyLDAvis.sklearn
+# import pyLDAvis.gensim_models
+# from sklearn.decomposition import LatenteDirichletAllocation
+from nltk import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-
+from string import punctuation
+import re
+import string
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+import seaborn as sns
+from wordcloud import WordCloud, STOPWORDS
+from string import punctuation
+import warnings
+# from gensim.models.doc2vec import Doc2Vec, TggedDocument
+import os
 import nltk
 import pandas as pd
-import numpy as np
 from nltk.corpus import stopwords
-import re
-import gensim
+from bertopic import BERTopic
 
-from keras.preprocessing.text import Tokenizer
-from sklearn.feature_extraction.text import TfidfVectorizer
+# from keras.preprocessing.text import Tokenizer
+# from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.datasets import fetch_20newsgroups
 
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics.pairwise import euclidean_distances
 
-from gensim.utils import simple_preprocess
-import gensim.corpora as corpora
-import gensim.models
+# from gensim.utils import simple_preprocess
+# import gensim.corpora as corpora
+# import gensim.models
+
+nltk.download('punkt')
+nltk.download('stopwords')
 
 # Topic List Functions
 
 def get_similar_words(word, topic_model, topn=100):
     temp_list=[]
-    
-    similar_words = topic_model.wv.most_similar(positive=[word], topn=topn)
+
+    similar_words = topic_model.most_similar(positive=[word], topn=topn)
 
     for w,similarity in similar_words:
         temp_list.append(w)
-    
+
     return temp_list
 
 def build_topic_dict(words, topic_model, topn=100):
     topic_dict={}
 
     for word in words:
-        topic_dict[word]: get_similar_words(word,topic_model)
+        topic_dict[word] = get_similar_words(word,topic_model)
 
     return topic_dict
 
 def get_topic_list(topic_dict):
-    return list(topic_dict.values())
+    temp_list = []
+    topic_words = list(topic_dict.values())
 
-def topic_dataframe(topic_list, topic_model):
+    for i,word_list in enumerate(topic_words):
+        temp_list.append(' '.join(word_list))
+    return temp_list
 
-    topic_word_list = get_topic_list(build_topic_dict(topic_list, topic_model))
-    
+# def topic_dataframe(topic_list, topic_model):
+
+#     topic_word_list = get_topic_list(build_topic_dict(topic_list, topic_model))
+
+#     topic_df = pd.DataFrame(topic_list, columns=['topics'])
+#     topic_df['topic_words'] = topic_word_list
+
+#     return topic_df
+
+def clean_text(sentence):
+
+    # Remove Non Alphanumeric sequences
+
+    pattern = re.compile(r'[^a-z]+')
+    sentence = sentence.lower()
+    sentence = pattern.sub(' ', sentence).strip()
+
+    # Tokenize
+
+    word_list = word_tokenize(sentence)
+
+    # Stop Words & Punctuation
+
+    stopwords_list = set(stopwords.words('english'))
+    punct = set(punctuation)
+
+    # Remove stop words, very small words & punctuation
+    word_list = [word for word in word_list if word not in stopwords_list]
+    word_list = [word for word in word_list if len(word) > 2]
+    word_list = [word for word in word_list if word not in punct]
+
+    # Stemming or Lemmatization
+
+    '''
+    stemmer = PorterStemmer()
+    word_list = [stemmer.stem(word) for word in word_list]
+    '''
+
+    lemmer = WordNetLemmatizer()
+
+    word_list = [lemmer.lemmatize(word) for word in word_list]
+
+    sentence = ' '.join(word_list)
+
+    return sentence
+
+
+def topic_dataframe(topic_dict, topic_list):
+
+    topic_word_list = get_topic_list(topic_dict)
+
     topic_df = pd.DataFrame(topic_list, columns=['topics'])
     topic_df['topic_words'] = topic_word_list
 
@@ -65,20 +129,19 @@ def calculate_topic_embeddings(topic_df,  tf_model):
 # Dataset Text Preprocessing
 
 def create_dataset_20NG(docNo=500):
-    docs = fetch_20newsgroups(shuffle=True, random_state=32, remove=('headers','footers','qutes'))
-    
+    tqdm.pandas()
+    dataset = fetch_20newsgroups(shuffle=True, random_state=32, remove=('headers','footers','qutes'))
+
     docs_df = pd.DataFrame(
-        {'docs': docs.data,
-        'target': docs.target}
+        {'docs': dataset.data,
+        'target': dataset.target}
     )
-    
-    docs_df = pd.DataFrame(docs,columns = ['docs'])
 
-    stop_words_l = stopwords.words('english')
-    docs_df['docs_clean'] = docs_df.docs.apply(lambda x: " ".join(re.sub(r'[^a-zA-Z]',' ',w).lower() for w in x.split() if re.sub(r'[^a-zA-Z]',' ',w).lowe() not in stop_words_l))
+    # docs_df = pd.DataFrame(dataset,columns = ['docs'])
 
-    # docs_df_test['target_name'] = docs_df['target'].apply(lambda x: docs.target_names[x])
+    docs_df['docs_clean'] = docs_df['docs'].progress_apply(lambda x: clean_text(str(x)))
 
+    docs_df['target_name'] = docs_df['target'].apply(lambda x: dataset.target_names[x])
     return docs_df.iloc[:min(docNo,docs_df.shape[0])]
 
 def calculate_document_embeddings(docs_df, tf_model):
@@ -93,7 +156,7 @@ def calculate_similarities(topic_emb, docs_emb, type='cosine'):
         pw_sims = euclidean_distances(docs_emb,topic_emb)
     return pw_sims
 
-def most_similar_topics(similarities, type='cosine'):  
+def most_similar_topics(similarities, topic_list, type='cosine'):
     most_similar_matrix = []
     if type == 'cosine':
         for docsims in similarities:
@@ -106,33 +169,19 @@ def most_similar_topics(similarities, type='cosine'):
 
     return most_similar_matrix
 
-# LDA 
-'''
-def sent_to_words(sentences):
-    for sentence in sentences:
-        yield(gensim.utils.simple_preprocess(str(sentence), deacc=True))
+def df_csv_save(docs_df, name):
+    path = './lib'
+    os.makedirs(path, exist_ok=True)
+    docs_df.to_csv(path + '/' + name + '.csv')
 
-def remove_stopwords(texts, stop_words):
-    return [[word for word in simple_preprocess(str(doc))if word not in stop_words] for doc in texts]
-
-def LDA_preperation(docs_df,stop_words):
-    data = docs_df['docs_clean'].values.to_list()
-    doc_words = list(sent_to_words(data))
-    doc_words = remove_stopwords(doc_words)
-
-    id2word = corpora.Dictionary(doc_words)
-    texts   = doc_words
-    corpus  = [id2word.doc2bow(text) for text in texts]
-
-    return id2word,corpus
+# LDA
 '''
 from sklearn.decomposition import TruncatedSVD, PCA, NMF, LatentDirichletAllocation
 from sklearn.manifold import TSNE
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.datasets import fetch_20newsgroups
+'''
 
 
 
-
-    

@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1IW4COGN5H4z1Jc3q6olsndGn7f404bBA
 """
 
-pip install sentence-transformers
+# pip install sentence-transformers
 
 import torch
 
@@ -31,11 +31,12 @@ docs_df = pd.read_csv("./lib/docs_df.csv")
 
 # docs_df
 
-emb_df = pd.read_csv("./lib/emb_df.csv").drop(emb_df.columns[0],axis=1)
+emb_df = pd.read_csv("./lib/emb_df.csv")
+emb_df.drop(emb_df.columns[0],axis=1)
 
 # emb_df
 
-pip install bertopic
+# pip install bertopic
 
 from bertopic import BERTopic
 
@@ -50,12 +51,18 @@ sub_docs_dmb_1  = emb_df.iloc[index]
 
 # emb_df.iloc[docs_df.index[docs_df["projected_topic"] == "computers"]].to_numpy()
 
-for topic in topic_list: 
-  globals()['docs_topic_%s' % topic] = docs_df.docs_clean.loc[docs_df["projected_topic"] == topic]
-  globals()['embs_topic_%s' % topic] = emb_df.iloc[docs_df.index[docs_df["projected_topic"] == topic]].to_numpy()
+subtopic_model_computers = BERTopic(nr_topics=10)
+comp_subtopics, comp_probas = subtopic_model_computers.fit_transform(docs_df.docs_clean.loc[docs_df["projected_topic"] == 'computers'],emb_df.iloc[docs_df.index[docs_df["projected_topic"] == "computers"]].to_numpy())
 
-  globals()['subtopic_model_%s' % topic] = BERTopic()
-  globals()['subtopic_model_%s_topics' % topic], globals()['subtopic_model_%s_probas' % topic] = globals()['subtopic_model_%s' % topic].fit_transform(globals()['docs_topic_%s' % topic], globals()['embs_topic_%s' % topic])
+print(subtopic_model_computers.topics_)
 
-subtopic_model_computers = BERTopic().fit(docs_topic_computers, embs_topic_computers)
+# for topic in topic_list: 
+#   globals()['docs_topic_%s' % topic] = docs_df.docs_clean.loc[docs_df["projected_topic"] == topic]
+#   globals()['embs_topic_%s' % topic] = emb_df.iloc[docs_df.index[docs_df["projected_topic"] == topic]].to_numpy()
+
+#   globals()['subtopic_model_%s' % topic] = BERTopic()
+#   globals()['subtopic_model_%s_topics' % topic], globals()['subtopic_model_%s_probas' % topic] = globals()['subtopic_model_%s' % topic].fit_transform(globals()['docs_topic_%s' % topic], globals()['embs_topic_%s' % topic])
+
+# subtopic_model_computers = BERTopic().fit(docs_topic_computers, embs_topic_computers)
+
 
