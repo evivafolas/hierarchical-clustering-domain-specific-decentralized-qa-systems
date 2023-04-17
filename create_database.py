@@ -16,7 +16,9 @@ import warnings
 import os
 import gensim
 import nltk
+import gensim.downloader as api
 from nltk.corpus import stopwords
+from sentence_transformers import SentenceTransformer
 from bertopic import BERTopic
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
@@ -31,15 +33,16 @@ class main():
             topic_list: list[str] = None,
             topN_similar: int = None,
             topic_model_type: str = None,
-            clusterning_type: str = None,
+            clustering_type: str = None,
             cluster_count: int = None,
-            tf_model: str = None,
+            tf_model_path: str = None,
             multilingual: bool = False,
-            nlp_model: str = None,
+            nlp_model_lib: str = None,
+            nlp_model_path: str = None,
             dataset: str = None,
             dataset_prunning: float = None,
-            docs_df_path = None,
-            topic_df_path = None            
+            docs_df_path: str = None,
+            topic_df_path: str = None            
     ):
         '''
         Initialization method.
@@ -47,7 +50,7 @@ class main():
         topic_list: A list of topics to be used in the topic model.
         topN_similar: The number of similar topic words to be generated.
         topic_model_type: The type of topic model to be used. Currently, only BERTopic is supported.
-        clusterning_type: The type of clusterning to be used. Currently, only BERTopic is supported.
+        clustering_type: The type of clustering to be used. Currently, only BERTopic is supported.
         tf_model: The gensim model used to generate the word embeddings.
         multilingual: A boolean value indicating whether the model is multilingual or not.
         nlp_model: The spacy model used to generate the word embeddings.
@@ -60,25 +63,32 @@ class main():
         self.topic_list = topic_list
         self.topN_similar = topN_similar
         self.topic_model_type = topic_model_type
-        self.clusterning_type = clusterning_type
+        self.clustering_type = clustering_type
         self.cluster_count = cluster_count
-        self.tf_model = tf_model
+        self.tf_model_path = tf_model_path
         self.multilingual = multilingual
-        self.nlp_model = nlp_model
+        self.nlp_model_lib = nlp_model_lib
+        self.nlp_model_path = nlp_model_path
         self.dataset = dataset
         self.dataset_prunning = dataset_prunning
         self.docs_df_path = docs_df_path
         self.topic_df_path = topic_df_path
 
-        if docs_df_path != None:
+        if docs_df_path != "None":
             self.docs_df = pd.read_csv(docs_df_path)
         else:
             self.docs_df = pd.DataFrame()
         
-        if topic_df_path != None:
+        if topic_df_path != "None":
             self.topic_df = pd.read_csv(topic_df_path)  
         else:        
             self.topic_df = pd.DataFrame()
+    
+        if self.nlp_model_lib == 'gensim':
+            self.nlp_model = api.load(self.nlp_model_path)
+
+        self.tf_model = SentenceTransformer(self.tf_model_path)
+    
     '''
         if self.load_file_type == 'yaml':
             with open(self.load_file_path, 'r') as stream:
@@ -129,7 +139,7 @@ class main():
 
         temp_list=[]
         similar_words = self.nlp_model.most_similar(positive=[word], topn=self.topN_similar)
-        for w in similar_words:
+        for w,similarity in similar_words:
             temp_list.append(w)
 
         return temp_list
@@ -177,7 +187,7 @@ class main():
 # 1.2 Document Preparation and Cleaning
 ############################################################################################################
 
-    def clean_text(sentence):
+    def clean_text(self, sentence):
         '''
         Function that performs the basic and essential text cleaning and preproccessing for NLP, in order for the results to be fed in a TF Model and generate document embeddings. 
         Removes Non Alpha sequences - Stop words and Punctuation, tokenizes and lemmatizes the text.
@@ -225,13 +235,15 @@ class main():
         tqdm.pandas()
 
         if self.dataset == '20NG':
-            temp_dataset = fetch_20newsgroups(subset='all', remove=('headers', 'footers', 'quotes'))
+            temp_dataset = fetch_20newsgroups(shuffle=True, random_state=32, remove=('headers', 'footers', 'quotes'))
+            
             self.docs_df = pd.DataFrame(
-                {'text': temp_dataset.data, 'target': temp_dataset.target, 'target_name': temp_dataset.target_names}
+                {'docs': temp_dataset.data,
+                 'target': temp_dataset.target}
             )
 
-            self.docs_df['docs_clean'] = self.docs_df['docs'].progress_apply(lambda x: utls.clean_text(str(x)))
-            self.docs_df['target_name'] = self.docs_df['target'].apply(lambda x: self.temp_dataset.target_names[x]) 
+            self.docs_df['docs_clean'] = self.docs_df['docs'].progress_apply(lambda x: self.clean_text(str(x)))
+            self.docs_df['target_name'] = self.docs_df['target'].apply(lambda x: temp_dataset.target_names[x]) 
     
             self.docs_df = self.docs_df[self.docs_df['docs_clean'].notna()]
 
@@ -448,13 +460,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--config_file_type", type=str, default='yaml', help="The type of the config file to be used. (json, yaml)")
-    parser.add_argument("--config_file_path", type=str, default='param_config.yaml', help="The path of the config file to be used.")
+    parser.add_argument("--config_file_path", type=str, default='param_config.yml', help="The path of the config file to be used.")
     parser.add_argument('--process', type=str, default=None, help="The process to be executed. (topic_modelling, topic_clustering, topic_classification, topic_evaluation, topic_visualization)")
 
     args = parser.parse_args()
 
-    if args.load_file_type == 'yaml':
-            with open(args.load_file_path, 'r') as stream:
+    if args.config_file_type == 'yaml':
+            with open(args.config_file_path, 'r') as stream:
                 try:
                     config = yaml.safe_load(stream)
                 except yaml.YAMLError as exc:
@@ -464,15 +476,16 @@ if __name__ == '__main__':
         topic_list=config['topic_list'],\
         topN_similar=config['topn_similar'],
         topic_model_type=config['topic_model_type'],
-        clusterning_type=config['clusterning_type'],
+        clustering_type=config['clustering_type'],
         cluster_count=config['cluster_count'],
-        tf_model=config['tf_model'][0],
+        tf_model_path=config['tf_model_path'][0],
         multilingual=config['multilingual'],
-        nlp_model=config['nlp_model'],
+        nlp_model_lib=config['nlp_model_lib'],
+        nlp_model_path=config['nlp_model_path'],
         dataset=config['dataset'],
         dataset_prunning=config['dataset_prunning'],
-        docs_df=config['docs_df'],
-        topic_df=config['topic_df']
+        docs_df_path=config['docs_df_path'],
+        topic_df_path=config['topic_df_path']
     )
 
 ############################################################################################################
@@ -480,7 +493,19 @@ if __name__ == '__main__':
 ############################################################################################################
     
     if (args.process == 'build'):
-        print(f'1')
+        print(f'Buiding the dataset...')
+
+        db.topic_df = db.build_topic_dataframe(db.build_topic_word_list(db.build_topic_dict()))
+        db.docs_df = db.create_dataframe()
+        
+        print(f'Topics: \n')
+        print(f'{db.topic_df.shape[0]} topics found.')
+        print(f'{db.topic_df.head()}')
+        
+        print(f'Documents: \n')
+        print(f'{db.docs_df.shape[0]} documents found.')
+        print(f'{db.docs_df.head()}')
+
     elif (args.process == 'classify'):
         print(f'2')
     elif (args.process == 'evaluate'):

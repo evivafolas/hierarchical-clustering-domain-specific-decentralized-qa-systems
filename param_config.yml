@@ -11,7 +11,7 @@ topn_similar: 100
 topic_model_type: 'bertopic'
 clustering_type: 'kmeans'
 cluster_count: 5
-tf_model:
+tf_model_path:
   - 'sentence-transformers/gtr-t5-base'
   - 'sentence-transformers/gtr-t5-large'
   - 'sentence-transformers/all-MiniLM-L6-v2'
@@ -20,9 +20,9 @@ tf_model:
   - 'sentence-transformers/all-mpnet-base-v2'
 multilingual: False
 nlp_model_lib: 'gensim'
-nlp_model: 'glove-wiki-gigaword-50'
+nlp_model_path: 'glove-wiki-gigaword-50'
 dataset: '20NG'
-dataset_prunning: 0.6
-docs_df_path: None
-topic_df_path: None
+dataset_prunning: 0.001
+docs_df_path: "None"
+topic_df_path: "None"
 
