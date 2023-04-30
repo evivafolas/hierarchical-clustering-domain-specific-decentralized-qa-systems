@@ -2,6 +2,7 @@ from nltk import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from string import punctuation
 import re
+import torch
 import string
 import numpy as np
 import pandas as pd
@@ -14,6 +15,7 @@ from wordcloud import WordCloud, STOPWORDS
 from string import punctuation
 import warnings
 import os
+import pickle
 import gensim
 import nltk
 import gensim.downloader as api
@@ -26,7 +28,7 @@ from gensim.models import CoherenceModel
 import gensim.corpora as corpora
 import sentence_tf_utils as utls
 
-class main():
+class Main():
 
     def __init__(
             self,
@@ -85,10 +87,14 @@ class main():
             self.topic_df = pd.DataFrame()
     
         if self.nlp_model_lib == 'gensim':
+            print(f'Loading gensim model: {self.nlp_model_path}')
             self.nlp_model = api.load(self.nlp_model_path)
+            print(f'Gensim model: {self.nlp_model_path} loaded successfully.')
 
+        print(f'Loading Sentence-Transformer model: {self.tf_model_path}')
         self.tf_model = SentenceTransformer(self.tf_model_path)
-    
+        print(f'Sentence-Transformer model: {self.tf_model_path} loaded successfully.')   
+
     '''
         if self.load_file_type == 'yaml':
             with open(self.load_file_path, 'r') as stream:
@@ -110,7 +116,7 @@ class main():
             return
         return
     
-    def df_csv_save(self, docs_df, name):
+    def df_csv_save(self, df_to_save, name):
         '''
         Saves the DataFrame as a .csv file in the ./lib directory
 
@@ -120,7 +126,7 @@ class main():
 
         path = './lib'
         os.makedirs(path, exist_ok=True)
-        self.docs_df.to_csv(path + '/' + name + '.csv')
+        df_to_save.to_csv(path + '/' + name + '.csv')
 
         return
 
@@ -174,13 +180,17 @@ class main():
             temp_list.append(' '.join(word_list))
         return temp_list
 
-    def build_topic_dataframe(self, topic_word_list):
+    def build_topic_dataframe(self, topic_word_list, save=False):
         '''
         Returns a dataframe with the topic name and the list of similar words.
 
         topic_word_list: The list of similar words seperated by one space.
         '''
         self.topic_df = pd.DataFrame({'topic': self.topic_list, 'words': topic_word_list})
+
+        if save:
+            self.df_csv_save(self.topic_df, 'topic_df')
+
         return self.topic_df
 
 ############################################################################################################
@@ -225,7 +235,7 @@ class main():
 
         return sentence
 
-    def create_dataframe(self):
+    def create_dataframe(self, save=False):
         '''
         Imports the dataset and creates a dataframe with the text, clean and the target/topic name.
 
@@ -250,32 +260,58 @@ class main():
         else:
             print('Dataset not supported')
         
+        if save:
+            self.df_csv_save(self.docs_df, 'docs_df')
+
         return self.docs_df.iloc[:min((int)(self.dataset_prunning*self.docs_df.shape[0]), self.docs_df.shape[0])]
 
 ############################################################################################################
 # 2.1 Embedding Generation and Classification
 ############################################################################################################
 
-    def generate_topic_embeddings(self, save=False):
+    def calcualte_embedding(self, sentence):
+        '''
+        Calculates the embedding of a sentence using the TF Model.
+
+        sentence: The sentence to be embedded.
+        '''
+
+        return self.tf_model.encode(sentence)
+
+    def generate_topic_embeddings(self, save:bool = False):
         '''
         Generates the topic embeddings using the TF Model.
 
         topic_df: The dataframe with the topics to be embedded.
         '''
-        self.topic_df['topic_emb'] = self.topic_df['words'].progress_apply(lambda x: self.tf_model.encode([x]))
+
+        topic_emb = self.tf_model.encode(self.topic_df['words'])
+        # self.topic_df['topic_emb'] = self.topic_df['words'].progress_apply(lambda x: self.tf_model.encode([x]))
         
-        return
+        if save:
+            self.df_csv_save(self.topic_df, 'topic_df_class')
+
+        return topic_emb
     
-    def generate_document_embeddings(self, save=False):
+    def generate_document_embeddings(self, save:bool = True):
         '''
         Generates the document embeddings using the TF Model.
 
         docs_df: The dataframe with the documents to be embedded.
         '''
-        self.docs_df['docs_emb'] = self.docs_df['docs_clean'].progress_apply(lambda x: self.tf_model.encode([x]))
+        # self.docs_df['docs_emb'] = self.docs_df['docs_clean'].progress_apply(lambda x: self.tf_model.encode([x]))
         
-        return
-    
+        doc_emb = self.tf_model.encode(self.docs_df['docs_clean'])
+
+        if save:
+            self.df_csv_save(self.docs_df, 'docs_df_class')
+            
+            file = open('doc_emb_pickle', 'wb')
+            pickle.dump(doc_emb, file)
+            file.close()
+
+        return doc_emb
+
     def calculate_similarities(self, v1, v2, type='euclid'):
         '''
         Calculates a pairwise similarity matrix between the two vectors given as input.
@@ -291,7 +327,7 @@ class main():
             pw_sims = euclidean_distances(v1,v2)
         return pw_sims
 
-    def calculate_document_similarities(self, type='euclid'):
+    def calculate_document_similarities(self, doc_emb, topic_emb, type:str ='euclid'):
         '''
         Calculates a pairwise similarity matrix to each topic for each document used in the dataset. Two metrics available, cosine similarity and euclidean distance.
 
@@ -299,14 +335,19 @@ class main():
         docs_emb: List of embedding representing each document.
         type: Type of similarity metric used, default -> Euclidean Distance.
         '''
-        
+
+        # docs_emb = self.docs_df['docs_emb'].to_numpy()
+        # print(f'{docs_emb}')
+        # topic_emb = self.topic_df['topic_emb'].to_numpy()
+        # print(f'{topic_emb}')
+
         if type == 'euclid':
-            pw_sims = euclidean_distances(self.docs_df.docs_emb, self.topic_df.topic_emb)
+            pw_sims = euclidean_distances(doc_emb, topic_emb)
         elif type == 'cosine':
-            pw_sims = cosine_similarity(self.docs_df.docs_emb, self.topic_df.topic_emb)
+            pw_sims = cosine_similarity(doc_emb, topic_emb)
         return pw_sims
     
-    def most_similar_topics(self, similarities, type='euclid'):
+    def most_similar_topics(self, similarities, type:str ='euclid'):
         '''
         Takes a similarity matrix and a topic list as an input and determines the most similar topic for each document.
 
@@ -352,16 +393,18 @@ class main():
         '''
 
         if(self.dataset=='20NG'):
+            target_names = self.docs_df.target_name.unique().tolist()
             target_names_emb = self.dataset_target_name_emb()
-            classifier_evaluation_matrix = self.most_similar_topics(self.calculate_similarities(v1=self.topic_df.topic_emb.to_numpy, v2=target_names_emb), type='euclid')
-            self.docs_df['target_name_proj'] = self.docs_df.target_name.apply(lambda x: classifier_evaluation_matrix[self.docs_df.target_name.unique().tolist().index])
+            classifier_evaluation_matrix = self.most_similar_topics(self.calculate_similarities(v1=target_names_emb, v2=topic_emb), type='euclid')
+            self.docs_df['target_name_projection'] = self.docs_df.target_name.apply(lambda x: classifier_evaluation_matrix[target_names.index(x)])
 
         n = self.docs_df.shape[0] # Number of documents in the dataset
 
         pos = 0 # Number of rows with matching 'Projected Topic' and 'Target Name Projection'    
 
         for i in range(n):
-            if self.docs_df.target_name_proj[i] == self.docs_df.projected_topic[i]:
+            # print(f'Target Name: {self.docs_df.target_name[i]:25} - Target-Name Projection: {self.docs_df.target_name_projection[i]:15} - Model Projected Topic: {self.docs_df.projected_topic[i]:15}')
+            if self.docs_df.target_name_projection[i] == self.docs_df.projected_topic[i]:
                 pos +=1
 
         classification_accuracy = (float)(pos / n)
@@ -456,7 +499,7 @@ class main():
         return coherencemodel.get_coherence()
     
 if __name__ == '__main__':
-    
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--config_file_type", type=str, default='yaml', help="The type of the config file to be used. (json, yaml)")
@@ -472,7 +515,7 @@ if __name__ == '__main__':
                 except yaml.YAMLError as exc:
                     print(exc)
 
-    db = main(
+    db = Main(
         topic_list=config['topic_list'],\
         topN_similar=config['topn_similar'],
         topic_model_type=config['topic_model_type'],
@@ -493,22 +536,52 @@ if __name__ == '__main__':
 ############################################################################################################
     
     if (args.process == 'build'):
+
+        # Dataset Initialization
+
         print(f'Buiding the dataset...')
 
         db.topic_df = db.build_topic_dataframe(db.build_topic_word_list(db.build_topic_dict()))
         db.docs_df = db.create_dataframe()
         
-        print(f'Topics: \n')
-        print(f'{db.topic_df.shape[0]} topics found.')
-        print(f'{db.topic_df.head()}')
+        print(f'Topic & Document DataFrame loaded.')
+
+        # Embedding Calculation
+
+        print(f'Caclulating Topic Embeddings.')
+        topic_emb = db.generate_topic_embeddings()
         
-        print(f'Documents: \n')
-        print(f'{db.docs_df.shape[0]} documents found.')
-        print(f'{db.docs_df.head()}')
+        print(f'Caclulating Document Embeddings.')
+        doc_emb = db.generate_document_embeddings()
+
+        print(f'Embeddings Calculated Successfully.')
+
+        # Document Classification
+
+        print(f'Predicting the Most Similar Topic for each Document.')
+        db.docs_df['projected_topic'] = db.most_similar_topics(db.calculate_document_similarities(doc_emb, topic_emb, type='euclid'), type='euclid')
+        print(f'Projected Topics for each document predicted.')
+
+        # Classification Evaluation
+
+        print(f'Classification Accuracy for {db.tf_model_path}: {db.calculate_classification_accuracy(topic_emb=topic_emb)*100}%')
+
+        print(db.docs_df)
 
     elif (args.process == 'classify'):
-        print(f'2')
+
+        if config.topic_df_path == "None":
+            db.topic_df = db.build_topic_dataframe(db.build_topic_word_list(db.build_topic_dict()))
+        else:
+            db.topic_df = db.load_csv(config.topic_df_path)
+
+        if config.docs_df_path == "None":
+            db.docs_df = db.create_dataframe()
+        else: 
+            db.docs_df = db.load_csv(config.docs_df_path)
+
     elif (args.process == 'evaluate'):
         print(f'3')
     else:
         print(f'Process {args.process} not found.')
+    

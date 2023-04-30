@@ -4,7 +4,6 @@ topic_list:
   - 'computers'
   - 'vehicles'
   - 'sports'
-  - 'classifieds'
   - 'politics'
   - 'religion'
 topn_similar: 100
@@ -22,7 +21,6 @@ multilingual: False
 nlp_model_lib: 'gensim'
 nlp_model_path: 'glove-wiki-gigaword-50'
 dataset: '20NG'
-dataset_prunning: 0.001
+dataset_prunning: 0.1
 docs_df_path: "None"
 topic_df_path: "None"
-
