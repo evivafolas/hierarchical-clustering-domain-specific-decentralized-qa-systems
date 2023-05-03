@@ -1,11 +1,11 @@
 # This file is used for the initialization of the class
 
 topic_list:
-  - 'computers'
-  - 'vehicles'
-  - 'sports'
+  - 'business'
+  - 'entertainment'
   - 'politics'
-  - 'religion'
+  - 'sport'
+  - 'tech'
 topn_similar: 100
 topic_model_type: 'bertopic'
 clustering_type: 'kmeans'
@@ -20,7 +20,10 @@ tf_model_path:
 multilingual: False
 nlp_model_lib: 'gensim'
 nlp_model_path: 'glove-wiki-gigaword-50'
-dataset: '20NG'
+dataset: 
+  - '20NG'
+  - 'AGNews'
+  - 'BBCNews'
 dataset_prunning: 0.1
 docs_df_path: "None"
 topic_df_path: "None"
