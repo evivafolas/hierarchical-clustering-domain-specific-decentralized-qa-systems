@@ -49,6 +49,8 @@ class Main():
         '''
         Initialization method.
 
+        Params
+        -------
         topic_list: A list of topics to be used in the topic model.
         topN_similar: The number of similar topic words to be generated.
         topic_model_type: The type of topic model to be used. Currently, only BERTopic is supported.
@@ -60,6 +62,10 @@ class Main():
         dataset_prunning: Percentage of full dataset used.
         load_file: The file to be loaded.
         save_file: Boolean set whether tosave a file or not.
+
+        Returns
+        -------
+        None
         '''
 
         self.topic_list = topic_list
@@ -138,9 +144,15 @@ class Main():
         '''
         Generates a list of n = topn words most similar to the given word, by using a gensim model.
 
+        Params
+        -------
         word: The source word to which the words must be most similar to.
         topic_model: The gensim model used to determine the most similar words.
         topn: The number of similar words to be generated.
+
+        Returns
+        -------
+        temp_list: A String list of n = topn words most similar to the given word.
         '''
 
         temp_list=[]
@@ -154,11 +166,17 @@ class Main():
         '''
         Returns a dictionary with the source word as a key and a list of its topn most similar words.
 
+        Params
+        -------
         words: The list of source words/topics provided by the user.
         topic_model: The gensim model used to determine the most similar words.
         topn: The number of similar words to be generated.
 
+        Returns
+        -------
+        topic_dict: A dictionary with the source word as a key and a list of its topn most similar words.
         '''
+
         topic_dict={}
 
         for word in self.topic_list:
@@ -170,9 +188,15 @@ class Main():
         '''
         Returns a list of the similar words seperated by one space.
 
+        Params
+        -------
         topic_dict: The topic_dictionary used to get the words.
 
+        Returns
+        -------
+        temp_list: List of word sequences seperated by one space.
         '''
+
         temp_list = []
         topic_words = list(topic_dict.values())
 
@@ -183,8 +207,14 @@ class Main():
     def build_topic_dataframe(self, topic_word_list, save=False):
         '''
         Returns a dataframe with the topic name and the list of similar words.
-
+        
+        Params
+        -------
         topic_word_list: The list of similar words seperated by one space.
+
+        Returns
+        -------
+        topic_df: Pandas DataFrame with the topic name and the list of similar words.
         '''
         self.topic_df = pd.DataFrame({'topic': self.topic_list, 'words': topic_word_list})
 
@@ -202,7 +232,13 @@ class Main():
         Function that performs the basic and essential text cleaning and preproccessing for NLP, in order for the results to be fed in a TF Model and generate document embeddings. 
         Removes Non Alpha sequences - Stop words and Punctuation, tokenizes and lemmatizes the text.
 
+        Params
+        -------
         sentence: Each document or part of text to be cleaned.
+
+        Returns
+        -------
+        sentence: String sentence of the cleaned text.
         '''
 
         # Remove Non Alphanumeric sequences
@@ -238,7 +274,13 @@ class Main():
         '''
         Imports the dataset and creates a dataframe with the text, clean and the target/topic name.
 
+        Params
+        -------
         topn: The number of documents to be used from the dataset. If the dataset is smaller than the value given, it will use all the documents.
+
+        Returns
+        -------
+        docs_df: Pandas DataFrame with the text, cleaned text and the target name.
         '''
 
         tqdm.pandas()
@@ -293,7 +335,13 @@ class Main():
         '''
         Calculates the embedding of a sentence using the TF Model.
 
+        Params
+        -------
         sentence: The sentence to be embedded.
+
+        Returns
+        -------
+        embeddings: Numpy Matrix of the embedding vector.
         '''
 
         return self.tf_model.encode(sentence)
@@ -302,7 +350,13 @@ class Main():
         '''
         Generates the topic embeddings using the TF Model.
 
+        Params
+        -------
         topic_df: The dataframe with the topics to be embedded.
+
+        Returns
+        -------
+        topic_emb: Numpy Matrix of the topic embeddings.
         '''
 
         topic_emb = self.tf_model.encode(self.topic_df['words'])
@@ -454,9 +508,16 @@ class Main():
         '''
         Builds the topic model using the LDA model from gensim.
 
+        Params
+        -------
         docs_df: The dataframe with the documents to be embedded.
         topic_df: The dataframe with the topics to be embedded.
+
+        Returns
+        -------
+        lda_model: The LDA model from gensim.
         '''
+
         if self.topic_model_type == 'lda':
 
             # Create Dictionary
@@ -493,8 +554,14 @@ class Main():
         '''
         Builds the subtopics for the bertopic model.
 
+        Params
+        -------
         bertopic_model: The bertopic model to be used.
         docs_df: The dataframe with the documents to be embedded.
+
+        Returns
+        -------
+        None
         '''
         for topic in self.topic_list: 
           globals()['docs_topic_%s' % topic] = docs_df.docs_clean.loc[docs_df["projected_topic"] == topic]
@@ -535,7 +602,11 @@ class Main():
     
 if __name__ == '__main__':
 
+    # Parse the arguments from the Command Line
+
     parser = argparse.ArgumentParser()
+
+    # Add the arguments to the parser, depending on the argument name.
 
     parser.add_argument("--config_file_type", type=str, default='yaml', help="The type of the config file to be used. (json, yaml)")
     parser.add_argument("--config_file_path", type=str, default='param_config.yml', help="The path of the config file to be used.")
@@ -543,12 +614,16 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    # Load and Read the Config File
+
     if args.config_file_type == 'yaml':
             with open(args.config_file_path, 'r') as stream:
                 try:
                     config = yaml.safe_load(stream)
                 except yaml.YAMLError as exc:
                     print(exc)
+
+    # Initialize the Database
 
     db = Main(
         topic_list=config['topic_list'],\
