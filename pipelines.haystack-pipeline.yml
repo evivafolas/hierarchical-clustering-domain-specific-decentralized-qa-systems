@@ -1,0 +1,16 @@
+# Haystack Pipeline Configuration YAML
+
+version: ignore
+
+components: 
+  - name: DocumentStore
+    type: ElasticsearchDocumentStore
+    params: 
+      embedding_dim: 768
+      host: localhost
+  - name: Retriever
+    type: EmbeddingRetriever
+    params:
+      document_store: DocumentStore
+      top_k: 10
+      embedding_model: "sentence-transformers/gtr-t5-base"
