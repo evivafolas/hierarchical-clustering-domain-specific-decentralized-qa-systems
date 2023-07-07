@@ -1,16 +1,61 @@
-# Haystack Pipeline Configuration YAML
+  # Haystack Pipeline Configuration YAML
 
-version: ignore
+version: 1.12.1
 
 components: 
   - name: DocumentStore
-    type: ElasticsearchDocumentStore
+    type: FAISSDocumentStore
     params: 
-      embedding_dim: 768
-      host: localhost
+      faiss_index_factory_str='Flat'
+  # - name: ESDocumentStore
+  #   type: ElasticsearchDocumentStore
+  #   params: 
+  #     embedding_dim: 768
+  #     host: localhost
   - name: Retriever
     type: EmbeddingRetriever
     params:
       document_store: DocumentStore
-      top_k: 10
-      embedding_model: "sentence-transformers/gtr-t5-base"
+      top_k: 5
+      embedding_model: "sentence-transformers/msmarco-distilbert-base-tas-b"
+      use_gpu: True
+  - name: Reader
+    type: FARMReader
+    params: 
+      model_name_or_path: 'deepst/roberta-base-squad2'
+      use_gpu: True
+  - name: QueryClassifier
+    type: TransformersQueryClassifier
+    params:
+      model_name_or_path: 'facebook/bart-large-mnli'
+      use_gpu: True
+      task: 'zero-shot-classification'
+      labels: ['tech','business','politics']
+  - name: FileTypeClassifier
+    type: FileTypeClassifier
+  - name: TextFileConverter
+    type: TextConverter
+  - name: Preprocessor
+    type: PreProcessor
+    params:
+      split_by: word
+      split_length: 250
+      split_overlap: 30 
+      split_respect_sentence_boundary: True
+
+pipelines: 
+  - name: query
+    nodes:
+      - name: Retriver
+        inputs: [Query]
+  - name: indexing
+      - name: FileTypeClassifier
+        inputs: [File]
+      - name: TextFileConverter
+        inputs: [FileTypeClassifier.output_1]
+      - name: Preprocessor
+        inputs: [TextFileConverter]
+      - name: Retriever
+        inputs: [Preprocessor]
+      - name: DocumentStore
+        inputs: [Retriever]
