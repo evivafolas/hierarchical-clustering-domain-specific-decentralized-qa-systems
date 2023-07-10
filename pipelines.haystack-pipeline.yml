@@ -1,17 +1,15 @@
-  # Haystack Pipeline Configuration YAML
-
 version: 1.12.1
 
 components: 
-  - name: DocumentStore
-    type: FAISSDocumentStore
-    params: 
-      faiss_index_factory_str='Flat'
-  # - name: ESDocumentStore
-  #   type: ElasticsearchDocumentStore
+  # - name: DocumentStore
+  #   type: FAISSDocumentStore
   #   params: 
-  #     embedding_dim: 768
-  #     host: localhost
+  #     faiss_index_factory_str='Flat'
+  - name: DocumentStore
+    type: ElasticsearchDocumentStore
+    params: 
+      embedding_dim: 768
+      host: localhost
   - name: Retriever
     type: EmbeddingRetriever
     params:
@@ -22,7 +20,7 @@ components:
   - name: Reader
     type: FARMReader
     params: 
-      model_name_or_path: 'deepst/roberta-base-squad2'
+      model_name_or_path: 'deepset/roberta-base-squad2'
       use_gpu: True
   - name: QueryClassifier
     type: TransformersQueryClassifier

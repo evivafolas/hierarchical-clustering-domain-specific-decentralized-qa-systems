@@ -1,3 +1,24 @@
+
+# services:
+#   haystack:
+#     image: deepset/haystack:cpu
+#     ports:
+#       - 8000:8000
+#     volumes:
+#       - ./data:/data
+#       - ./document-search.haystack-pipeline.yml:/app/document-search.haystack-pipeline.yml
+#     environment:
+#       - HAYSTACK_DOCUMENT_STORE=faiss
+#       - HAYSTACK_FAISS_SQLITE_FILEPATH=/data/faiss.db
+#       - HAYSTACK_PIPELINE_PATH=/app/document-search.haystack-pipeline.yml
+
+#   faiss_document_store:
+#     image: my-haystack-image:latest
+#     volumes:
+#       - ./data:/data
+#     environment:
+#       - FAISS_SQLITE_FILEPATH=/data/faiss.db
+
 # Docker Compose for REST API interaction
 
 services: 
@@ -5,30 +26,30 @@ services:
     image: "deepset/haystack:cpu"
     volumes:
       - ./:/opt'/pipelines
-      # - ./rest_api/rest_api/pipeline:/opt/pipelines
+      - ./rest_api/rest_api/pipeline:/opt/pipelines
     ports:
       - 8000:8000
 
     restart: on-failure
 
     environment:
-      # - DOCUMENTSTORE_PARAMS_HOST=elasticsearch
+      - DOCUMENTSTORE_PARAMS_HOST=elasticsearch
       - PIPELINE_YAML_PATH=/opt/pipelines/document-search.haystack-pipeline.yml
       - TOKENIZERS_PARALLELISM=false
 
-    # depends_on:
-    #   elasticsearch:
-    #     condition: service_healthy
-      
-    # elasticsearch: 
-    #   image: "docker"
-    #   ports:
-    #     - 9200:9200
-    #   restart: on-failure
-    #   environment:
-    #     - discovery.type=single-node
-    #   healthcheck:
-    #     test: curl --fail http://localhost:9200/_cat/health || exit 1
-    #     interval: 10s
-    #     timeout: 1s
-    #     retries: 10
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+ 
+  elasticsearch: 
+    image: "docker"
+    ports:
+      - 9200:9200
+    restart: on-failure
+    environment:
+      - discovery.type=single-node
+    healthcheck:
+      test: curl --fail http://localhost:9200/_cat/health || exit 1
+      interval: 10s
+      timeout: 1s
+      retries: 10
