@@ -1,31 +1,8 @@
-
-# services:
-#   haystack:
-#     image: deepset/haystack:cpu
-#     ports:
-#       - 8000:8000
-#     volumes:
-#       - ./data:/data
-#       - ./document-search.haystack-pipeline.yml:/app/document-search.haystack-pipeline.yml
-#     environment:
-#       - HAYSTACK_DOCUMENT_STORE=faiss
-#       - HAYSTACK_FAISS_SQLITE_FILEPATH=/data/faiss.db
-#       - HAYSTACK_PIPELINE_PATH=/app/document-search.haystack-pipeline.yml
-
-#   faiss_document_store:
-#     image: my-haystack-image:latest
-#     volumes:
-#       - ./data:/data
-#     environment:
-#       - FAISS_SQLITE_FILEPATH=/data/faiss.db
-
-# Docker Compose for REST API interaction
-
 services: 
   haystack-api:
     image: "deepset/haystack:cpu"
     volumes:
-      - ./:/opt'/pipelines
+      - ./:/opt/pipelines
       - ./rest_api/rest_api/pipeline:/opt/pipelines
     ports:
       - 8000:8000
@@ -40,16 +17,19 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
- 
-  elasticsearch: 
-    image: "docker"
-    ports:
-      - 9200:9200
-    restart: on-failure
+  
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.2
+    container_name: elasticsearch
+    restart: always
     environment:
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
       - discovery.type=single-node
+    ports:
+      - '9200:9200'
     healthcheck:
       test: curl --fail http://localhost:9200/_cat/health || exit 1
       interval: 10s
       timeout: 1s
       retries: 10
+

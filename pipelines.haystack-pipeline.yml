@@ -1,10 +1,6 @@
 version: 1.12.1
 
-components: 
-  # - name: DocumentStore
-  #   type: FAISSDocumentStore
-  #   params: 
-  #     faiss_index_factory_str='Flat'
+components:
   - name: DocumentStore
     type: ElasticsearchDocumentStore
     params: 
@@ -28,7 +24,7 @@ components:
       model_name_or_path: 'facebook/bart-large-mnli'
       use_gpu: True
       task: 'zero-shot-classification'
-      labels: ['tech','business','politics']
+      labels: ['tech','business','politics','entertainment','sport']
   - name: FileTypeClassifier
     type: FileTypeClassifier
   - name: TextFileConverter
@@ -42,6 +38,10 @@ components:
       split_respect_sentence_boundary: True
 
 pipelines: 
+  - name: query_classification
+    nodes: 
+      - name: QueryClassifier
+        input: [Query]
   - name: query
     nodes:
       - name: Retriver
