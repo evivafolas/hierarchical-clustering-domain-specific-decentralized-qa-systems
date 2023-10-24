@@ -1,0 +1,31 @@
+# This file is used for the initialization of the class
+
+topic_labels:
+  - 'business'
+  - 'entertainment'
+  - 'politics'
+  - 'sport'
+  - 'tech'
+
+transformer_model_name:
+  - 'sentence-transformers/gtr-t5-base'
+  - 'sentence-transformers/gtr-t5-large'
+  - 'sentence-transformers/all-MiniLM-L6-v2'
+  - 'sentence-transformers/all-MiniLM-L12-v2'
+  - 'sentence-transformers/all-distilroberta-v1'
+  - 'sentence-transformers/all-mpnet-base-v2'
+
+topic_model_top_n: 15
+
+zero_shot_classification_model: "facebook/bart-large-mnli"
+
+multilingual: False
+
+multilabel_classification: True
+multilable_classification_number: 2
+mutlilabel_classifition_threshold: 0.5
+
+dataset: 
+  - 'BBCNews'
+
+# dataset_prunning: 0.1

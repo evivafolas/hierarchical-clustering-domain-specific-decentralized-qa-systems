@@ -1,0 +1,12 @@
+topic_labels:
+  - 'business'
+  - 'entertainment'
+  - 'politics'
+  - 'sport'
+  - 'tech'
+
+multi_domain_qa: False
+
+retriever_top_k: 10
+reader_top_k: 5
+

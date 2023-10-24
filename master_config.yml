@@ -1,0 +1,14 @@
+topic_labels:
+  - 'business'
+  - 'entertainment'
+  - 'politics'
+  - 'sport'
+  - 'tech'
+
+query_classifier_model: 'facebook/bart-large-mnli'
+
+query_list: 
+  - 'What kind of threat are Apple\'s music jukebox iTunes facing?'
+  - 'What device was named 2006\'s gadget of the year?'
+  - 'Who won the New York Marathon in the last momments?'
+  - 'Why was the release of the film about the Mumbai blasts in 1993 postponed?'

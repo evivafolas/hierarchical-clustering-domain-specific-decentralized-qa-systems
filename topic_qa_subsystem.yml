@@ -1,0 +1,9 @@
+dataframe_filepath: '/lib/classified/{topic}_document'
+
+embedding_model: 'sentence-transformers/all-MiniLM-L6-v2'
+reader_model: 'deepset/tinyroberta-squad2'
+
+retriever_top_k: 10
+reader_top_k: 5
+
+port_number: 9000
