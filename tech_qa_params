@@ -1,0 +1,7 @@
+tech:
+  dataframe_filepath: ./lib/classified/tech_document
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  port_number: 9005
+  reader_model: deepset/tinyroberta-squad2
+  reader_top_k: 5
+  retriever_top_k: 10

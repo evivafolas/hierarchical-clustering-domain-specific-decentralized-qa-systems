@@ -3,6 +3,7 @@ import yaml
 import time
 import pickle
 import torch
+import time
 import argparse
 import pandas as pd
 import numpy as np 
@@ -24,23 +25,28 @@ app = FastAPI()
 
 def ask_question(
         query: str,
-        topic_labels: list(str),
-        qa_config_files: list(dict),
+        topic_labels,
+        qa_config_files,
         query_classifier
 ):
     query_classification_result = query_classifier.run(query)
 
     query_topic = topic_labels[int(query_classification_result[1].split('_')[-1])-1]
 
-    qa_url = f'"http://127.0.0.1:{qa_config_files[query_topic]["port_number"]}/answer_query'
-    data = query
+    print(f'Query classified to the topic: {query_topic}')
 
-    response = requests.post(qa_url, json=data)
+    qa_url = f'http://127.0.0.1:{qa_config_files[query_topic]["port_number"]}/answer_query'
+    question = {
+        'input_query': query
+    }
+    print(question)
+    response = requests.post(qa_url,params=question)
 
     if response.status_code == 200:
         result = response.json()
-        answer = result["result1"]
-        confidence = result["result2"]
+
+        answer = result["answer"]
+        confidence = result["confidence"]
 
         if confidence == True:
             return answer, None 
@@ -50,9 +56,10 @@ def ask_question(
                 if topic == query_topic:
                     continue
                 else:
-                    qa_url = f'"http://127.0.0.1:{qa_config_files[topic]["port_number"]}/answer_query'
+                    qa_url = f'http://127.0.0.1:{qa_config_files[topic]["port_number"]}/answer_query'
+                    response = requests.post(qa_url,params=question)
                     result = response.json()
-                    answer = result["result1"]
+                    answer = result["answer"]
 
                     alt_answers.append(
                         {
@@ -80,14 +87,23 @@ if __name__ == "__main__":
         labels = master_params['topic_labels']
     )
 
-    query_answer_pairs = {}
-    for query in master_params['query_list']:
-        
+    qa_subsystems = create_qa_subsystems.create_qa_subsystems(master_params['topic_labels'], master_params['embedding_model'], master_params['reader_model'])
+    
+    subsystem_readiness = ''
+    while(subsystem_readiness.lower() != 'r' ):
+        subsystem_readiness = str(input('Enter R when QA Systems are launched\n'))
+
+    query= None
+    while(query!=""):
+        query = str(input("Type a queston: \t"))
+    
+        if query == '': break
+
         print(f'Query: {query}')
 
-        temp_answer = ask_question(query, master_params['topic_labels'], create_qa_subsystems.create_qa_subsystems(), query_classifier)
+        temp_answer = ask_question(query, master_params['topic_labels'], qa_subsystems, query_classifier)
         
-        if temp_answer[0]:
+        if temp_answer[0] == None:
             print('There was a problem fetching the answer.')
             continue
 
@@ -100,4 +116,25 @@ if __name__ == "__main__":
             for ans in temp_answer[1]:
                 print(f"{list(ans.keys())[0].title()} QA Sub-system:")
                 print_answers(ans[list(ans.keys())[0]])
+
+    # query_answer_pairs = {}
+    # for query in master_params['query_list']:
+        
+    #     print(f'Query: {query}')
+
+    #     temp_answer = ask_question(query, master_params['topic_labels'], qa_subsystems, query_classifier)
+        
+    #     if temp_answer[0] == None:
+    #         print('There was a problem fetching the answer.')
+    #         continue
+
+    #     print()
+    #     print_answers(temp_answer[0])
+
+    #     if temp_answer[1] == None:
+    #         pass    
+    #     else:
+    #         for ans in temp_answer[1]:
+    #             print(f"{list(ans.keys())[0].title()} QA Sub-system:")
+    #             print_answers(ans[list(ans.keys())[0]])
 

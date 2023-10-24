@@ -5,10 +5,17 @@ topic_labels:
   - 'sport'
   - 'tech'
 
+
+embedding_model: 'sentence-transformers/all-MiniLM-L6-v2'
+reader_model: 'deepset/tinyroberta-squad2'
+
+retriever_top_k: 10
+reader_top_k: 5
+
 query_classifier_model: 'facebook/bart-large-mnli'
 
 query_list: 
-  - 'What kind of threat are Apple\'s music jukebox iTunes facing?'
-  - 'What device was named 2006\'s gadget of the year?'
+  - 'What kind of threat are Apples music jukebox iTunes facing?'
+  - 'What device was named 2006s gadget of the year?'
   - 'Who won the New York Marathon in the last momments?'
   - 'Why was the release of the film about the Mumbai blasts in 1993 postponed?'

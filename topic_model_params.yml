@@ -25,7 +25,6 @@ multilabel_classification: True
 multilable_classification_number: 2
 mutlilabel_classifition_threshold: 0.5
 
-dataset: 
-  - 'BBCNews'
+dataset: 'BBCNews'
 
 # dataset_prunning: 0.1

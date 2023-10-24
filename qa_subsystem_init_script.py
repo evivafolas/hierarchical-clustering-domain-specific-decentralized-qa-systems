@@ -35,11 +35,11 @@ if device == 'cpu':
 
 with open(f'{args.topic}_qa_params', 'r') as stream:
     try:
-        qa_params = yaml.safe_load(stream)
+        qa_params = yaml.safe_load(stream)[args.topic]
     except yaml.YAMLError as exc:
         print(exc)
 
-documents = pd.read_csv(qa_params['dataframe_filepath'])
+documents = pd.read_pickle(qa_params['dataframe_filepath'])
 
 document_store = InMemoryDocumentStore()
 
@@ -99,6 +99,7 @@ def query(
 
 @app.post("/answer_query")
 async def answer_query(input_query: str):
+    print(f'Question: {input_query}')
     answer, confidence = query(input_query, retriever_top_k=qa_params['retriever_top_k'], reader_top_k=qa_params['reader_top_k'])
     return{
        'answer': answer,

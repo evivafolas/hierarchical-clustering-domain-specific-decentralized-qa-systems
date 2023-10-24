@@ -7,6 +7,9 @@ import argparse
 import numpy as np
 import pandas as pd
 
+import torch
+from torch import multiprocessing as mp
+
 from tqdm import tqdm
 from string import punctuation
 
@@ -44,7 +47,11 @@ if args.type == 'yaml':
       except yaml.YAMLError as ex:
         print(ex)
 
-transformer_model_name = topic_model_params['transformer_model_name'][1]
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+if device == 'cpu':
+    torch.set_num_threads(mp.cpu_count() - 1)
+
+transformer_model_name = topic_model_params['transformer_model_name'][2]
 
 # ######### ######### ######### ######### ######### ######### ######### ######### ######### ######### ######### #########  
 # ----------------------------------------  Preprocessing & Import Functions  ----------------------------------------- #
@@ -167,10 +174,11 @@ for topic in bertopic_keywords:
 # Classification of each BERTopic Generated topic to one of the user defined topic labels
 topic_clf_res = []
 
+print(f'Now running Zero-Shot Classification for Topics')
 for topic in tqdm(bertopics):
   topic_clf_res.append(topic_classifier_pipeline(topic, topic_labels, multi_label=True))
 
-print(topic_clf_res)
+# print(topic_clf_res)
 
 # Check for Multiple Label Classification
 mutli = []
@@ -231,7 +239,7 @@ for i in tqdm(range(len(embeddings))):
 documents['embeddings'] = embeddings_list
 
 # Save dataframe to csv
-documents.to_csv(f'./lib/processed_dataframe/{transformer_model_name}.csv')
+documents.to_csv(f'./lib/processed_dataframe/minilm_l6_v2.csv')
 
 for topic in topic_labels:
   
@@ -239,5 +247,5 @@ for topic in topic_labels:
   globals()['%s_documents' % topic] = documents.loc[(documents.label_clf == topic) | (documents.label_clf2 == topic)]
 
   # Save topic specific documents
-  globals()['%s_documents' % topic].to_csv(f'/lib/classified/{topic}_document.csv')
+  globals()['%s_documents' % topic].to_pickle(f'./lib/classified/{topic}_document')
 

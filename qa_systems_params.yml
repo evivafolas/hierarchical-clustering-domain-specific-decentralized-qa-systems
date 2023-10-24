@@ -5,8 +5,10 @@ topic_labels:
   - 'sport'
   - 'tech'
 
-multi_domain_qa: False
+embedding_model: 'sentence-transformers/all-MiniLM-L6-v2'
+reader_model: 'deepset/tinyroberta-squad2'
 
 retriever_top_k: 10
 reader_top_k: 5
 
+multi_domain_qa: False
