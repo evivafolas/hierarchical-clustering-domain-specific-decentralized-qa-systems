@@ -121,9 +121,10 @@ if __name__ == "__main__":
             else:
                 for ans in temp_answer[1]:
                     print(f"{list(ans.keys())[0].title()} QA Sub-system:")
-                    print(f'{ans["answers"][0]["answer"]}, {round(ans["answers"][0]["score"] * 100, 2)}% confident, as shown in: {ans["answers"][0]["context"]}')
+                    # print(ans)
+                    print(f'{ans[list(ans.keys())[0]]["answers"][0]["answer"]}, {round(ans[list(ans.keys())[0]]["answers"][0]["score"] * 100, 2)}% confident, as shown in: {ans[list(ans.keys())[0]]["answers"][0]["context"]}')
                     # print_answers(ans[list(ans.keys())[0]])
-    
+
     elif type_of_input.lower() == 'l':
         query_answer_pairs = {}
         for query in master_params['query_list']:
