@@ -92,8 +92,7 @@ def query(
 
   if answer['answers'][0].score < 0.5:
     confidence = False
-  else:
-     confidence = True
+  else: confidence = True
     
   return answer, confidence 
 

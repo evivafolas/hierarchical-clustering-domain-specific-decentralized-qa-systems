@@ -39,7 +39,7 @@ def ask_question(
     question = {
         'input_query': query
     }
-    print(question)
+    # print(question)
     response = requests.post(qa_url,params=question)
 
     if response.status_code == 200:
@@ -57,16 +57,16 @@ def ask_question(
                     continue
                 else:
                     qa_url = f'http://127.0.0.1:{qa_config_files[topic]["port_number"]}/answer_query'
-                    response = requests.post(qa_url,params=question)
-                    result = response.json()
-                    answer = result["answer"]
+                    alt_response = requests.post(qa_url,params=question)
+                    alt_result = alt_response.json()
+                    alt_answer = alt_result["answer"]
 
                     alt_answers.append(
                         {
-                            topic: answer
+                            topic: alt_answer
                         }
                     )
-                return answer, alt_answers
+        return answer, alt_answers
     else:
         return None, None
     
@@ -91,50 +91,63 @@ if __name__ == "__main__":
     
     subsystem_readiness = ''
     while(subsystem_readiness.lower() != 'r' ):
-        subsystem_readiness = str(input('Enter R when QA Systems are launched\n'))
+        subsystem_readiness = str(input('Enter R for ready when QA Systems are launched\n'))
 
-    query= None
-    while(query!=""):
-        query = str(input("Type a queston: \t"))
+    type_of_input = str(input('Enter T to type the questions or L for the list in the parameters file\n'))
+
+    if type_of_input.lower() == 't':
+
+        query= None
+        while(query!=""):
+            query = str(input("Type a queston (or blank to quit): \n"))
+        
+            if query == '': break
+
+            print(f'Query: {query}')
+
+            temp_answer = ask_question(query, master_params['topic_labels'], qa_subsystems, query_classifier)
+            
+            if temp_answer[0] == None:
+                print('There was a problem fetching the answer.')
+                continue
+
+            print()
+            # print(temp_answer)
+            # print_answers(temp_answer[0])
+            print(f'{temp_answer[0]["answers"][0]["answer"]}, {round(temp_answer[0]["answers"][0]["score"] * 100, 2)}% confident, as shown in: {temp_answer[0]["answers"][0]["context"]}')
+
+            if temp_answer[1] == None:
+                pass    
+            else:
+                for ans in temp_answer[1]:
+                    print(f"{list(ans.keys())[0].title()} QA Sub-system:")
+                    print(f'{ans["answers"][0]["answer"]}, {round(ans["answers"][0]["score"] * 100, 2)}% confident, as shown in: {ans["answers"][0]["context"]}')
+                    # print_answers(ans[list(ans.keys())[0]])
     
-        if query == '': break
+    elif type_of_input.lower() == 'l':
+        query_answer_pairs = {}
+        for query in master_params['query_list']:
+            
+            print('\n########################')
+            print(f'Query: {query}')
 
-        print(f'Query: {query}')
+            temp_answer = ask_question(query, master_params['topic_labels'], qa_subsystems, query_classifier)
+            
+            if temp_answer[0] == None:
+                print('There was a problem fetching the answer.')
+                continue
 
-        temp_answer = ask_question(query, master_params['topic_labels'], qa_subsystems, query_classifier)
-        
-        if temp_answer[0] == None:
-            print('There was a problem fetching the answer.')
-            continue
+            print()
+            # print(temp_answer)
+            # print_answers(temp_answer[0])
+            print(f'{temp_answer[0]["answers"][0]["answer"]}, {round(temp_answer[0]["answers"][0]["score"] * 100, 2)}% confident, as shown in: {temp_answer[0]["answers"][0]["context"]}')
 
-        print()
-        print_answers(temp_answer[0])
-
-        if temp_answer[1] == None:
-            pass    
-        else:
-            for ans in temp_answer[1]:
-                print(f"{list(ans.keys())[0].title()} QA Sub-system:")
-                print_answers(ans[list(ans.keys())[0]])
-
-    # query_answer_pairs = {}
-    # for query in master_params['query_list']:
-        
-    #     print(f'Query: {query}')
-
-    #     temp_answer = ask_question(query, master_params['topic_labels'], qa_subsystems, query_classifier)
-        
-    #     if temp_answer[0] == None:
-    #         print('There was a problem fetching the answer.')
-    #         continue
-
-    #     print()
-    #     print_answers(temp_answer[0])
-
-    #     if temp_answer[1] == None:
-    #         pass    
-    #     else:
-    #         for ans in temp_answer[1]:
-    #             print(f"{list(ans.keys())[0].title()} QA Sub-system:")
-    #             print_answers(ans[list(ans.keys())[0]])
+            if temp_answer[1] == None:
+                pass    
+            else:
+                for ans in temp_answer[1]:
+                    print(f"{list(ans.keys())[0].title()} QA Sub-system:")
+                    # print(ans)
+                    print(f'{ans[list(ans.keys())[0]]["answers"][0]["answer"]}, {round(ans[list(ans.keys())[0]]["answers"][0]["score"] * 100, 2)}% confident, as shown in: {ans[list(ans.keys())[0]]["answers"][0]["context"]}')
+                    # print_answers(ans[list(ans.keys())[0]])
 
