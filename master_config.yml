@@ -5,7 +5,6 @@ topic_labels:
   - 'sport'
   - 'tech'
 
-
 embedding_model: 'sentence-transformers/all-MiniLM-L6-v2'
 reader_model: 'deepset/tinyroberta-squad2'
 
@@ -15,57 +14,353 @@ reader_top_k: 5
 query_classifier_model: 'facebook/bart-large-mnli'
 
 query_list: 
-  - 'What kind of threat are Apples music jukebox iTunes facing?'
-  - 'What device was named 2006s gadget of the year?'
-  - 'Who won the New York Marathon in the last momments?'
-  - 'Why was the release of the film about the Mumbai blasts in 1993 postponed?'
-  - What is the latest news in the business category?
-  - Who won the recent election in the politics category?
-  - When was the last technology-related article published?
-  - Who are the top-scoring players in the current sports season?
-  - What is the most recent development in the entertainment industry?
-  - Can you provide information on the stock market performance today?
-  - What is the headline of the most recent article in the technology category?
-  - When did the last major political event take place?
-  - Tell me about the key figures in the current sports news.
-  - What is the current state of the global economy?
-  - Who are the leading actors in the latest movie release?
-  - What's the recent news regarding climate change?
-  - What's the most significant scientific discovery reported recently?
-  # - Tell me about the top technology trends in 2023.
-  # - Who won the last major sports event?
-  # - What's the current situation in the entertainment industry?
-  # - Provide details on the latest IPO in the business sector.
-  # - Who is the CEO of the largest tech company right now?
-  # - Explain the recent diplomatic conflict in the politics category.
-  # - What are the trending fashion styles in 2023?
-  # - What is the focus of the recent education news?
-  # - Who is the leading scorer in the sports league this year?
-  # - What is the latest innovation in the tech world?
-  # - Can you summarize the current situation in the Middle East?
-  # - Tell me about the recent achievements in space exploration.
-  # - Explain the impact of recent regulations on the energy industry.
-  # - What is the status of climate change agreements?
-  # - Who are the key players in the gaming industry today?
-  # - What is the most recent acquisition in the business world?
-  # - Who won the Nobel Prize in literature this year?
-  # - What is the current state of healthcare in the politics news?
-  # - What are the emerging trends in food and cuisine?
-  # - Provide information about the recent breakthroughs in medical research.
-  # - Who is leading in the technology sector in terms of market share?
-  # - What is the status of the latest trade negotiations?
-  # - Explain the recent controversy in the entertainment world.
-  # - What are the recent developments in automotive technology?
-  # - Who are the candidates for the upcoming political election?
-  # - Describe the recent performance of your favorite sports team.
-  # - What is the most recent report on environmental conservation efforts?
-  # - Who are the prominent figures in the fashion industry right now?
-  # - Tell me about the recent developments in renewable energy.
-  # - What is the current state of international relations?
-  # - Explain the latest breakthroughs in artificial intelligence.
-  # - Who are the major players in the e-commerce business today?
-  # - What is the focus of the current healthcare reform discussions?
-  # - What are the recent trends in home and interior design?
-  # - Provide information on the recent advancements in robotics.
-  # - Who are the leaders in the aerospace and aviation industry?
-  # - What is the status of recent immigration policies in politics?
+  - question: 'What kind of threat are Apples music jukebox iTunes facing?'
+    answer: security
+    topic: tech
+
+  - question: 'What device was named 2006s gadget of the year?'
+    answer: PSP
+    topic: tech
+
+  - question: 'Who won the New York Marathon in the last momments?'
+    answer: Paula Radcliffe
+    topic: sport
+
+  - question: 'Why was the release of the film about the Mumbai blasts in 1993 postponed?'
+    answer: Protest by the ones on trial 
+    topic: entertainment
+
+  - question: 'How many tonnes of crops did Ethiopia produce in 2004'
+    answer: 14.27 million
+    topic: business
+
+  - question: 'How many rupiah did Inodnesia spend on fuel subsidies'
+    answer: 59.2 trillion 
+    topic: business
+
+  - question: 'What is the oil demand estimate for 2005 according to IEA in barells a day'
+    answer: 84 million
+    topic: business
+
+  - question: 'Which carmaker saw big growth in Asia this year'
+    answer: BMW
+    topic: business
+
+  - question: 'Who is the Italian Prime Minister'
+    answer: Sylvio Berlusconi
+    topic: business
+
+  - question: 'With whom is Fiat involved in a potential takeover'
+    answer: General Moters
+    topic: business
+
+  - question: Which Australian airlines recorded record profits
+    answer: Qantas
+    topic: business
+
+  - question: What for is US tycoon Malcolm Glazer putting in offers
+    answer: Machested United 
+    topic: business
+
+  - question: Why did 2850 employees of ABN Amro get laid off
+    answer: falling profits
+    topic: business
+
+  - question: What is Pan-european stock exchange Euronext planning to take over
+    answer: London Stock Exchange
+    topic: business
+
+  - question: Who control Aguas Argentinas
+    answer: Frances Suez
+    topic: business
+
+  - question: What was actor Liam Neeson promoting at his dinner party in New York
+    answer: Belfasts lyric theatre 
+    topic: entertainment
+
+  - question: Who is the director of the new harry potter film
+    answer: Alfonso Cuaron
+    topic: entertainment
+
+  - question: Which film star returned to the top of the box office
+    answer: Robert De Niro
+    topic: entertainment
+
+  - question: Who is Bruce Willis suing for his injury
+    answer: Revolution Studios
+    topic: entertainment
+
+  - question: How many nominations does Million Dollar Baby have
+    answer: seven
+    topic: entertainment
+
+  - question: What was actor Liam Neeson promoting at his dinner party in New York
+    answer: Belfasts lyric theatre 
+    topic: entertainment
+
+  - question: What for was Sir Elton Johns concert raising money
+    answer: victims of Asian tsunami
+    topic: entertainment
+
+  - question: What song did the son of Doris Day help write
+    answer: Kokomo
+    topic: entertainment
+
+  - question: Who is leading the nominations for the Bafta awards
+    answer: BBC
+    topic: entertainment
+
+  - question: Who is said to write and direct the new friday the 13th horror movies
+    answer: Quentin Tarantino
+    topic: entertainment
+
+  - question: How many years until Peter Jackson starts work on the Hobbit
+    answer: up to four years
+    topic: entertainment
+
+  - question: Where will the labour party hold the 2006 autumn conference
+    answer: Manchester
+    topic: politics
+
+  - question: When will smoking inside be banned in Scottland
+    answer: spring of 2006
+    topic: politics
+
+  - question: Who is the prime minister of the UK
+    answer: Tony Blair
+    topic: politics
+
+  - question: Who is trying to ban the sale of violent video games
+    answer: Patricia Hewitt
+    topic: politics
+
+  - question: To what is Ms Kelly opposed
+    answer: embryo research
+    topic: politics
+
+  - question: What is the record for womens 5000m
+    answer: 14 min 32.93 sec
+    topic: sports
+
+  - question: Which Greek sprinters have been suspended
+    answer: Kenteris and Thanou
+    topic: sports
+
+  - question: Who won the 1000m at Norwich
+    answer: Kelly Holmes
+    topic: sports
+
+  - question: Who scored in the first half of Rooneys return to Everton
+    answer: Cristiano Ronaldo and Quinton Fortune
+    topic: sports
+
+  - question: From which club was coach Ranieri sacked
+    answer: Valencia
+    topic: sports
+
+  - question: How long will Carlton Cole be out injured
+    answer: six weeks
+    topic: sports
+
+  - question: What team does Carlo Cudicini play for
+    answer: Chelsea
+    topic: sports
+
+  - question: Who is germanys football coach
+    answer: Jurgen Klinsmann
+    topic: sports
+
+  - question: How much did Rafa Benitez offer for Morientes
+    answer: 8 million
+    topic: sports
+
+  - question: Who criticised Wimbledon over equal prize money dispute
+    answer: Lindsay Davenport
+    topic: sports
+
+  - question: Who did Gael Monfis win in the first round of the Qatar Open
+    answer: Gaston Gaudio
+    topic: sports
+
+  - question: Who is Argentina playing in the final of the Hopman Cup 
+    answer: Slovakia
+    topic: sports
+
+  - question: What software is IBM committing to
+    answer: Linux
+    topic: tech
+
+  - question: Why is Microsoft replacing 14 million xbox cables
+    answer: safety concerns
+    topic: tech
+
+  - question: What company implemented DVD anti piracy protection
+    answer: Macrovision
+    topic: tech
+
+  - question: How many bafta awrds did FPS game half life 2 win
+    answer: six
+    topic: tech
+
+  - question: How many phones with cameras are going to be sold by the end of 2004
+    answer: 159 million
+    topic: tech
+
+  - question: Who opened CES in Las Vegas
+    answer: Bill Gates
+    topic: tech
+
+  - question: Who said thatby 2020 phones will be printed on the wrist
+    answer: Ian Pearson
+    topic: tech
+
+  - question: Which is the first station offering radio via 3G
+    answer: Virgin
+    topic: tech
+
+  - question: What is the status of recent immigration policies in politics?
+    answer: out of control
+    topic: politics
+
+queries:
+  - question: 'What kind of threat are Apples music jukebox iTunes facing?'
+    answer: security
+    topic: tech
+
+  - question: 'What device was named 2006s gadget of the year?'
+    answer: PSP
+    topic: tech
+
+  - question: 'Who won the New York Marathon in the last momments?'
+    answer: Paula Radcliffe
+    topic: sport
+
+
+  - question: 'Why was the release of the film about the Mumbai blasts in 1993 postponed?'
+    answer: Protest by the ones on trial 
+    topic: business
+
+  -
+    question: Who won the 2004 presidential election in the United States?
+    answer: George W. Bush won the 2004 presidential election in the United States.
+    topic: politics
+
+  - 
+    question: What was the major economic event in 2005 that impacted global markets?
+    answer: The major economic event in 2005 was the global financial crisis.
+    topic: business
+
+  - 
+    question: Who won the 2004 Olympic Games in Athens for men's 100m sprint?
+    answer: Justin Gatlin won the 100m sprint at the 2004 Olympic Games in Athens.
+    topic: sport
+
+  - 
+    question: What was the popular tech gadget in 2004?
+    answer: The iPod Mini was a popular tech gadget in 2004.
+    topic: tech
+
+  - 
+    question: What were the top-grossing movies of 2005?
+    answer: 'The top-grossing movies of 2005 included Star Wars: Episode III and "Harry Potter and the Goblet of Fire.'
+    topic: entertainment
+
+  - 
+    question: Who was the Prime Minister of the UK in 2004?
+    answer: Tony Blair was the Prime Minister of the UK in 2004.
+    topic: Politics
+
+  - 
+    question: What were the major mergers and acquisitions in the business world in 2005?
+    answer: Major mergers and acquisitions in 2005 included Company A merging with Company B.
+    topic: Business
+
+  - 
+    question: Who won the 2004 Wimbledon Championship in men's singles?
+    answer: Roger Federer won the 2004 Wimbledon Championship in men's singles.
+    topic: Sport
+
+  - 
+    question: What were the notable tech innovations in 2004?
+    answer: Notable tech innovations in 2004 included the launch of Facebook.
+    topic: Tech
+
+  - 
+    question: Who were the prominent actors in the entertainment industry in 2005?
+    answer: Prominent actors in 2005 included Actors X, Y, and Z.
+    topic: Entertainment
+
+  - 
+    question: What were the key political events in 2004 in the Middle East?
+    answer: Key political events in 2004 in the Middle East included regional conflicts.
+    topic: Politics
+
+  - 
+    question: What were the major business trends in the UK in 2005?
+    answer: Major business trends in the UK in 2005 included increased exports.
+    topic: Business
+
+  - 
+    question: Who were the top athletes in the sports world in 2004?
+    answer: Top athletes in 2004 included Athlete A, Athlete B, and Athlete C.
+    topic: Sport
+
+  - 
+    question: What were the significant technological advancements in mobile phones in 2005?
+    answer: Significant advancements in mobile phones in 2005 included the introduction of 3G technology.
+    topic: tech
+
+  - 
+    question: What were the most talked-about movies in 2004?
+    answer: 'The most talked-about movies in 2004 included The Lord of the Rings: The Return of the King.'
+    topic: Entertainment
+
+  - 
+    question: What were the key policy decisions made by the UK government in 2004?
+    answer: Key policy decisions in 2004 included changes in tax policy.
+    topic: Politics
+
+  - 
+    question: What were the major financial market movements in 2005?
+    answer: Major financial market movements in 2005 included a stock market rally.
+    topic: Business
+
+  - 
+    question: Who were the standout athletes in the 2004 Summer Olympics?
+    answer: Standout athletes in the 2004 Summer Olympics included Michael Phelps and Usain Bolt.
+    topic: Sport
+
+  - 
+    question: What was the groundbreaking technology in 2004 that changed the internet?
+    answer: In 2004, Google launched Gmail, a groundbreaking email service.
+    topic: Tech
+
+  - 
+    question: Who were the breakout stars in the entertainment industry in 2005?
+    answer: Breakout stars in 2005 included Actor W and Actress Y.
+    topic: Entertainment
+
+  - 
+    question: What were the major international diplomatic negotiations in 2004?
+    answer: Major international diplomatic negotiations in 2004 focused on peace talks in the Middle East.
+    topic: Politics
+
+  - 
+    question: How did the energy sector perform in 2005 in terms of investments?
+    answer: In 2005, the energy sector saw a surge in investments in renewable energy.
+    topic: Business
+
+  - 
+    question: Who were the world champions in various sports in 2004?
+    answer: World champions in 2004 included the Brazilian national soccer team.
+    topic: Sport
+
+  - 
+    question: What were the top gaming consoles in 2004?
+    answer: Top gaming consoles in 2004 included the PlayStation 2 and Xbox.
+    topic: Tech
+
+  - 
+    question: Who won the prestigious acting awards in the entertainment industry in 2005?
+    answer: The prestigious acting awards in 2005 went to Actors P and Q.
+    topic: Entertainment

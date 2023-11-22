@@ -1,0 +1,47 @@
+business:
+  dataframe_filepath: ./lib/classified/business_document
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  port_number: 9001
+  reader_model: deepset/tinyroberta-squad2
+  reader_top_k: 5
+  retriever_top_k: 10
+
+entertainment:
+  dataframe_filepath: ./lib/classified/entertainment_document
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  port_number: 9002
+  reader_model: deepset/tinyroberta-squad2
+  reader_top_k: 5
+  retriever_top_k: 10
+
+politics:
+  dataframe_filepath: ./lib/classified/politics_document
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  port_number: 9003
+  reader_model: deepset/tinyroberta-squad2
+  reader_top_k: 5
+  retriever_top_k: 10
+
+sport:
+  dataframe_filepath: ./lib/classified/sport_document
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  port_number: 9004
+  reader_model: deepset/tinyroberta-squad2
+  reader_top_k: 5
+  retriever_top_k: 10
+
+tech:
+  dataframe_filepath: ./lib/classified/tech_document
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  port_number: 9005
+  reader_model: deepset/tinyroberta-squad2
+  reader_top_k: 5
+  retriever_top_k: 10
+
+
+
+
+
+
+
+  

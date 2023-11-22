@@ -20,6 +20,7 @@ from nltk.tokenize import word_tokenize
 
 from bertopic import BERTopic
 from transformers import pipeline
+from sklearn.cluster import KMeans
 from sentence_transformers import SentenceTransformer
 
 nltk.download('punkt')
@@ -128,10 +129,12 @@ embeddings = embedding_model.encode(
 )
 
 # Create the topic model with the existing document embeddings
+cluster_model = KMeans(n_clusters=20)
 topic_model = BERTopic(
   embedding_model=transformer_model_name,
+  hdbscan_model=cluster_model,
   top_n_words = topic_model_params['topic_model_top_n'],
-  n_gram_range = (1,5)
+  n_gram_range = (1,3)
 )
 
 topics, probs = topic_model.fit_transform(documents['docs_clean'], embeddings)
@@ -208,6 +211,8 @@ labels = []
 labels2 = []
 
 for doc, doc_topic in tqdm(enumerate(topics)):
+
+  doc_topic -= 1
 
   labels.append(topic_clf_res[doc_topic+1]['labels'][0])
   

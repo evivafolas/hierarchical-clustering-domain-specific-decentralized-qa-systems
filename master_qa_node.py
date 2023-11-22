@@ -126,13 +126,38 @@ if __name__ == "__main__":
                     # print_answers(ans[list(ans.keys())[0]])
 
     elif type_of_input.lower() == 'l':
-        query_answer_pairs = {}
+        # query_answer_pairs = {}
+        # for query in master_params['query_list']:
+            
+        #     print('\n########################')
+        #     print(f'Query: {query}')
+
+        #     temp_answer = ask_question(query, master_params['topic_labels'], qa_subsystems, query_classifier)
+            
+        #     if temp_answer[0] == None:
+        #         print('There was a problem fetching the answer.')
+        #         continue
+
+        #     print()
+        #     # print(temp_answer)
+        #     # print_answers(temp_answer[0])
+        #     print(f'{temp_answer[0]["answers"][0]["answer"]}, {round(temp_answer[0]["answers"][0]["score"] * 100, 2)}% confident, as shown in: {temp_answer[0]["answers"][0]["context"]}')
+
+        #     if temp_answer[1] == None:
+        #         pass    
+        #     else:
+        #         for ans in temp_answer[1]:
+        #             print(f"{list(ans.keys())[0].title()} QA Sub-system:")
+        #             # print(ans)
+        #             print(f'{ans[list(ans.keys())[0]]["answers"][0]["answer"]}, {round(ans[list(ans.keys())[0]]["answers"][0]["score"] * 100, 2)}% confident, as shown in: {ans[list(ans.keys())[0]]["answers"][0]["context"]}')
+        #             # print_answers(ans[list(ans.keys())[0]])
+        
         for query in master_params['query_list']:
             
             print('\n########################')
-            print(f'Query: {query}')
+            print(f'Query: {query["question"]}')
 
-            temp_answer = ask_question(query, master_params['topic_labels'], qa_subsystems, query_classifier)
+            temp_answer = ask_question(query["question"], master_params['topic_labels'], qa_subsystems, query_classifier)
             
             if temp_answer[0] == None:
                 print('There was a problem fetching the answer.')
@@ -142,6 +167,8 @@ if __name__ == "__main__":
             # print(temp_answer)
             # print_answers(temp_answer[0])
             print(f'{temp_answer[0]["answers"][0]["answer"]}, {round(temp_answer[0]["answers"][0]["score"] * 100, 2)}% confident, as shown in: {temp_answer[0]["answers"][0]["context"]}')
+            print(f'Actual Answer: {query["answer"]}')
+            print(f'Question Topic: {query["topic"]}')
 
             if temp_answer[1] == None:
                 pass    
@@ -151,4 +178,5 @@ if __name__ == "__main__":
                     # print(ans)
                     print(f'{ans[list(ans.keys())[0]]["answers"][0]["answer"]}, {round(ans[list(ans.keys())[0]]["answers"][0]["score"] * 100, 2)}% confident, as shown in: {ans[list(ans.keys())[0]]["answers"][0]["context"]}')
                     # print_answers(ans[list(ans.keys())[0]])
+                    print("\n")
 

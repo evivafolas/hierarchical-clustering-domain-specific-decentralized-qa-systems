@@ -1,0 +1,280 @@
+test_queries:
+  - 
+    question: What are the key challenges in the business world today?
+    topic: business
+
+  - 
+    question: Who is the greatest basketball player of all time?
+    topic: sport
+
+  - 
+    question: Explain the concept of blockchain technology.
+    topic: tech
+
+  - 
+    question: What is the primary goal of foreign policy in international relations?
+    topic: politics
+
+  - 
+    question: Who won the Academy Award for Best Actor in the last Oscar ceremony?
+    topic: entertainment
+
+  - 
+    question: How does inflation impact the economy?
+    topic: business
+
+  - 
+    question: Describe the rules of a popular sport like soccer.
+    topic: sport
+
+  - 
+    question: What are the recent advancements in artificial intelligence?
+    topic: tech
+
+  - 
+    question: What is the role of a parliament in a democratic government?
+    topic: politics
+
+  - 
+    question: Who is the highest-paid actor in Hollywood?
+    topic: entertainment
+
+  - 
+    question: How do trade deficits affect a country's economy?
+    topic: business
+
+  - 
+    question: Who are the top athletes in tennis right now?
+    topic: sport
+
+  - 
+    question: What is the future of electric vehicles in the automotive industry?
+    topic: tech
+
+  - 
+    question: What are the major political ideologies in modern politics?
+    topic: politics
+
+  - 
+    question: Who are the rising stars in the music industry?
+    topic: entertainment
+
+  - 
+    question: How do interest rates influence business investments?
+    topic: business
+
+  - 
+    question: Explain the rules of a popular sport like American football.
+    topic: sport
+
+  - 
+    question: What are the key challenges in cybersecurity?
+    topic: tech
+
+  - 
+    question: What is the impact of immigration policies on national identity?
+    topic: politics
+
+  - 
+    question: Who are the leading directors in the film industry?
+    topic: entertainment
+
+  - 
+    question: What are the implications of a trade war between major economies?
+    topic: business
+
+  - 
+    question: Who won the recent major golf tournament?
+    topic: sport
+
+  - 
+    question: How is 5G technology changing the way we use smartphones?
+    topic: tech
+
+  - 
+    question: Explain the concept of populism in politics.
+    topic: politics
+
+  - 
+    question: What are the top TV shows in the streaming world?
+    topic: entertainment
+
+  - 
+    question: How do supply chain disruptions affect global businesses?
+    topic: business
+
+  - 
+    question: Who is the most successful female athlete in history?
+    topic: sport
+
+  - 
+    question: What are the recent innovations in renewable energy?
+    topic: tech
+
+  - 
+    question: What are the key issues in international trade agreements?
+    topic: politics
+
+  - 
+    question: Who are the influential writers in contemporary literature?
+    topic: entertainment
+
+  - 
+    question: How does mergers and acquisitions impact shareholder value?
+    topic: business
+
+  - 
+    question: What are the rules and scoring system in tennis?
+    topic: sport
+
+  - 
+    question: How is machine learning applied in healthcare?
+    topic: tech
+
+  - 
+    question: What are the major political debates in environmental policy?
+    topic: politics
+
+  - 
+    question: Who are the emerging talents in the music industry?
+    topic: entertainment
+
+  - 
+    question: How do global supply chains work in the modern world?
+    topic: business
+
+  - 
+    question: What are the strategies for success in professional soccer?
+    topic: sport
+
+  - 
+    question: Explain the concept of augmented reality.
+    topic: tech
+
+  - 
+    question: What are the recent developments in immigration law?
+    topic: politics
+
+  - 
+    question: Who are the award-winning actors in recent films?
+    topic: entertainment
+
+  - 
+    question: How do startups impact the business landscape?
+    topic: business
+
+  - 
+    question: What are the key strategies in sports management?
+    topic: sport
+
+  - 
+    question: What are the recent breakthroughs in biotechnology?
+    topic: tech
+
+  - 
+    question: What are the major political issues in global security?
+    topic: politics
+
+  - 
+    question: Who are the iconic actors in classic cinema?
+    topic: entertainment
+
+  - 
+    question: How do corporate social responsibility initiatives benefit companies?
+    topic: business
+
+  - 
+    question: What are the training regimens for professional athletes?
+    topic: sport
+
+  - 
+    question: Explain the concept of quantum computing.
+    topic: tech
+
+  - 
+    question: What are the key foreign policy decisions in the last decade?
+    topic: politics
+
+  - 
+    question: Who are the influential fashion designers in the industry?
+    topic: entertainment
+
+  - 
+    question: How do taxation affect small businesses?
+    topic: business
+
+  - 
+    question: What are the rules and scoring system in tennis?
+    topic: sport
+
+  - 
+    question: How is 5G technology changing the way we use smartphones?
+    topic: tech
+
+  - 
+    question: Explain the concept of populism in politics.
+    topic: politics
+
+  - 
+    question: What are the top TV shows in the streaming world?
+    topic: entertainment
+
+  - 
+    question: How do supply chain disruptions affect global businesses?
+    topic: business
+
+  - 
+    question: Who is the most successful female athlete in history?
+    topic: sport
+
+  - 
+    question: What are the recent innovations in renewable energy?
+    topic: tech
+
+  - 
+    question: What are the key issues in international trade agreements?
+    topic: politics
+
+  - 
+    question: Who are the influential writers in contemporary literature?
+    topic: entertainment
+
+  - 
+    question: How does mergers and acquisitions impact shareholder value?
+    topic: business
+
+  - 
+    question: What are the rules and scoring system in tennis?
+    topic: sport
+
+  - 
+    question: How is machine learning applied in healthcare?
+    topic: tech
+
+  - 
+    question: What are the major political debates in environmental policy?
+    topic: politics
+
+  - 
+    question: Who are the emerging talents in the music industry?
+    topic: entertainment
+
+  - 
+    question: How do global supply chains work in the modern world?
+    topic: business
+
+  - 
+    question: What are the strategies for success in professional soccer?
+    topic: sport
+
+  - 
+    question: Explain the concept of augmented reality.
+    topic: tech
+
+  - 
+    question: What are the recent developments in immigration law?
+    topic: politics
+
+  - 
+    question: Who are the award-winning actors in recent films?
+    topic: entertainment
